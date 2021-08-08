@@ -1,6 +1,8 @@
 package word
 
-import "strings"
+import (
+	"strings"
+)
 
 func ToLower(s string)string{
 	return strings.ToLower(s)
@@ -13,7 +15,9 @@ func UnderscoreToUpperCamelCase(s string)string{
 	array:=strings.Split(s, "_")
 	for i,v:=range array{
 		if i>0{
-
+          v=strings.Title(v)
 		}
+		result+=v
 	}
+	return result
 }
