@@ -4,6 +4,7 @@ import(
 )
 func init() {
    rootCmd.AddCommand(wordCmd)
+   rootCmd.AddCommand(timeCmd)
 }
 
 var (
