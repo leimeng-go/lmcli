@@ -9,15 +9,19 @@ import (
 	"time"
 )
 func init() {
-	timeCmd.AddCommand(nowTimeCmd,calculateCmd)
+	timeCmd.AddCommand(nowTimeCmd,calculateCmd,conversionCmd)
 
 	calculateCmd.Flags().StringVarP(&calculateTime,"calculate","c","", "需要计算的时间，有效单位为时间戳或已格式化后的时间")
 	calculateCmd.Flags().StringVarP(&duration,"duration","d","",`持续时间，有效时间单位为"ns","us "`)
+	conversionCmd.Flags().StringVarP(&input,"input","i","","需要转换的时间，有效单位为时间戳或已格式化后的时间")
+	conversionCmd.Flags().StringVarP(&conversion,"conversion","c","","时间转换方式")
 }
 
 var (
 	calculateTime string
 	duration string
+	input string
+	conversion string
 )
 var (
 	timeCmd=&cobra.Command{
@@ -65,6 +69,19 @@ var (
             	log.Fatalf("timer.GetCalculateTime err: %v",err.Error())
 			}
 			log.Printf("输出结果: %s, %d",calculateTime.Format(layout),calculateTime.Unix())
+		},
+	}
+
+	conversionCmd=&cobra.Command{
+		Use: "conversion",
+		Short: "时间格式转换",
+		Long: "时间格式转换",
+		Run: func(cmd *cobra.Command, args []string) {
+			switch conversion {
+			case "unix2str":
+				t,_:=strconv.ParseInt(input,10,64)
+			 log.Printf("Unix时间戳: %d,转换后: %s",t,timer.UnixToLayout2Time(t))
+			}
 		},
 	}
 )
