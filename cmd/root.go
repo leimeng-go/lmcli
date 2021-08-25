@@ -5,6 +5,7 @@ import(
 func init() {
    rootCmd.AddCommand(wordCmd)
    rootCmd.AddCommand(timeCmd)
+   rootCmd.AddCommand(sql2StructCmd)
 }
 
 var (

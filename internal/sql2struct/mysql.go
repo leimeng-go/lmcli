@@ -7,20 +7,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var (
-	DBTypeToStructType=map[string]string{
-		"int":"int32",
-		"tinyint":"int8",
-		"smallint":"int",
-		"mediumint":"int64",
-		"bigint":"int64",
-		"bit":"int",
-		"bool":"bool",
-		"enum":"string",
-		"set":"string",
-		"varchar":"string",
-	}
-)
+
+
 type DBModel struct {
 	DBEngine *sql.DB
 	DBInfo DBInfo
@@ -42,11 +30,13 @@ type TableColumn struct{
 	ColumnType string
 	ColumnComment string 
 }
-
+func NewDBModel(info *DBInfo)*DBModel{
+	return &DBModel{DBInfo: *info}
+}
 func (m *DBModel)Connect()error{
 	var err error
-	dsn:=fmt.Sprintf("%s:%s@tcp(%s)/infomation_schema?charset=%s&parseTime=true&loc=Local",m.DBInfo.UserName,m.DBInfo.Password,m.DBInfo.Host,m.DBInfo.Charset)
-	m.DBEngin,err=sql.Open(m.DBInfo.DBType,dsn)
+	dsn:=fmt.Sprintf("%s:%s@tcp(%s)/information_schema?charset=%s&parseTime=true&loc=Local",m.DBInfo.UserName,m.DBInfo.Password,m.DBInfo.Host,m.DBInfo.Charset)
+	m.DBEngine,err=sql.Open(m.DBInfo.DBType,dsn)
 	if err!=nil{
 		return err
 	}
@@ -54,9 +44,7 @@ func (m *DBModel)Connect()error{
 }
 
 func (m *DBModel)GetColumns(dbName,tableName string)([]*TableColumn,error){
-	query:="SELECT"+
-	"COLUMN_NAME,DATA_TYPE,COLUMN_KEY,IS_NULLABLE,COLUMN_TYPE,COLUMN_COMMENT"+
-	"FROM COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME=?"
+	query:=`SELECT COLUMN_NAME,DATA_TYPE,COLUMN_KEY,IS_NULLABLE,COLUMN_TYPE,COLUMN_COMMENT FROM COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME=?`
 	rows,err:=m.DBEngine.Query(query,dbName,tableName)
 	if err!=nil{
 		return nil,err
