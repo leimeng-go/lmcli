@@ -17,15 +17,9 @@ func TestRunCommandEval(t *testing.T){
 		t.Error(err.Error())
 		return
 	}
-   client.Database("test")
 	testDB:=client.Database("test")
-	//result:=client.Database("test").RunCommand(ctx,bson.M{
-	//	"eval":"print(hello)",
-	//})
-	//t.Log(result.Err())
 	opts:=make([]*options.ListCollectionsOptions, 0)
 	opts=append(opts,options.ListCollections().SetNameOnly(true))
-
 	res,err:=testDB.ListCollections(ctx,bson.M{"name":"users"})
 	if err!=nil{
 		t.Error(err.Error())
@@ -40,11 +34,63 @@ func TestRunCommandEval(t *testing.T){
 			t.Error(err.Error())
 			return
 		}
-		elem,err:=next.LookupErr("va")
-	}
+		elem,err:=next.LookupErr("options","validator","$jsonSchema")
+		if err!=nil{
+			t.Error(err.Error())
+			return
+		}
+		if elem.Type()!=bson.TypeEmbeddedDocument{
+			t.Error("类型不对")
+			return
+		}
+		t.Log(elem.String())
+		md, ok:=elem.MDocumentOK()
+		if !ok{
+			t.Log("")
+			return
+		}
+        result:=SchemaData{}
 
-	client.Database("test").ListCollections(ctx,bson.D{{"name","users"}}) {
+		result.BsonType=md["bsonType"].StringValue()
+		arrayStr:=md["required"].Array().String()
+		t.Logf(arrayStr)
+		array:=[]Element{}
+		for k,v:=range md["properties"].MDocument() {
+			element:=Element{}
+			element.Key=k
+			//t.Log(v.Document())
+			for _,v1:=range v.Document() {
+				switch v1.Key {
+				case "bsonType":
+					element.BsonType=v1.Value.String()
+				case "description":
+					element.Description=v1.Value.String()
+
+				}
+			}
+			//element.Description=v.Document()["description"].StringValue()
+			//element.BsonType=v.MDocument()["bsonType"].StringValue()
+			array=append(array, element)
+		}
+		t.Log(array)
+		//for k,v:=range elem.MDocument() {
+		//	t.Logf("文档类型: %s",)
+		//}
 	}
+    res.Close(ctx)
+	//client.Database("test").ListCollectionNames(ctx,bson.D{{"name","users"}}) {
+	//}
 	// t.Log(result.Err().Error())j
 	// t.Log(client.Ping(ctx,nil))
+}
+type SchemaData struct {
+	BsonType string `json:"bson_type"`
+	Required []string `json:"required"`
+	Properties []Element `json:"properties"`
+}
+type Element struct {
+	Key string `json:"key"`
+	BsonType string `json:"bson_type"`
+	Description string `json:"description"`
+
 }
