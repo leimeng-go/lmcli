@@ -13,19 +13,31 @@ type DBModel struct{
 	DBClient *mongo.Client
     DBInfo DBInfo
 }
-
+var (
+	MongoGoType=map[string]string{
+		"string": "string",
+		"double": "float64",
+		"bool":   "bool",
+		"Date":   "time.time",
+		"null":   "null",
+		"int":    "int32",
+		"object": "interface{}",
+		"long":   "int64",
+		"array":  "[]interface{}",
+	}
+)
 type DBInfo struct{
 	User string
 	Password string
 	Host string
-	Port int 
+	Port int
+
 }
 
 type CollectionField struct{
-	ColumnKey string
-	DataType string
-	Occurrences int 
-	Percents float32
+	ColumnKey string //字段名称
+	ColumnType string //字段类型
+	Description string  //字段说明
 }
 
 func NewDBModel(info *DBInfo)*DBModel{
