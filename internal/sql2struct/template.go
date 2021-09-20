@@ -20,24 +20,26 @@ const (
 	}
 	`
 )
+
 var (
-	DBTypeToStructType=map[string]string{
-		"int":"int32",
-		"tinyint":"int8",
-		"smallint":"int",
-		"mediumint":"int64",
-		"bigint":"int64",
-		"bit":"int",
-		"bool":"bool",
-		"enum":"string",
-		"set":"string",
-		"varchar":"string",
+	DBTypeToStructType = map[string]string{
+		"int":       "int32",
+		"tinyint":   "int8",
+		"smallint":  "int",
+		"mediumint": "int64",
+		"bigint":    "int64",
+		"bit":       "int",
+		"bool":      "bool",
+		"enum":      "string",
+		"set":       "string",
+		"varchar":   "string",
 	}
 )
 
-func TypeToGO(typeMysql string)string{
+func TypeToGO(typeMysql string) string {
 	return DBTypeToStructType[typeMysql]
 }
+
 type StructTemplate struct {
 	structTpl string
 }
@@ -53,7 +55,8 @@ type StructTemplateDB struct {
 	TableName string
 	Columns   []*StructColumn
 }
-func NewStructTemplate()*StructTemplate{
+
+func NewStructTemplate() *StructTemplate {
 	return &StructTemplate{
 		structTpl: structTpl,
 	}
@@ -62,27 +65,27 @@ func (t *StructTemplate) AssemblyColumns(tbColumns []*TableColumn) []*StructColu
 	tplColumns := make([]*StructColumn, 0, len(tbColumns))
 	for _, column := range tbColumns {
 		tplColumns = append(tplColumns, &StructColumn{
-			Name: column.ColumnName,
-			Type: column.DataType,
-			Tag:  fmt.Sprintf("`json:"+"%s"+"`",column.ColumnName),
+			Name:    column.ColumnName,
+			Type:    column.DataType,
+			Tag:     fmt.Sprintf("`json:"+"%s"+"`", column.ColumnName),
 			Comment: column.ColumnComment,
 		})
 	}
 	return tplColumns
 }
-func (t *StructTemplate)Generate(tableName string,tplColumns []*StructColumn)error{
-	tpl:=template.Must(template.New("sql2struct").Funcs(template.FuncMap{
-		"ToCamelCase":word.UnderscoreToUpperCamelCase,
-		"TypeToGO":TypeToGO,
+func (t *StructTemplate) Generate(tableName string, tplColumns []*StructColumn) error {
+	tpl := template.Must(template.New("sql2struct").Funcs(template.FuncMap{
+		"ToCamelCase": word.UnderscoreToUpperCamelCase,
+		"TypeToGO":    TypeToGO,
 	}).Parse(t.structTpl))
 
-	tplDB:=StructTemplateDB{
+	tplDB := StructTemplateDB{
 		TableName: tableName,
-		Columns: tplColumns,
+		Columns:   tplColumns,
 	}
 
-	err:=tpl.Execute(os.Stdout,tplDB)
-	if err!=nil{
+	err := tpl.Execute(os.Stdout, tplDB)
+	if err != nil {
 		return err
 	}
 	return nil

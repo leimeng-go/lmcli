@@ -1,19 +1,21 @@
 package cmd
-import(
+
+import (
 	"github.com/spf13/cobra"
 )
+
 func init() {
-   rootCmd.AddCommand(wordCmd)
-   rootCmd.AddCommand(timeCmd)
-   rootCmd.AddCommand(sql2StructCmd)
+	rootCmd.AddCommand(wordCmd)
+	rootCmd.AddCommand(timeCmd)
+	rootCmd.AddCommand(sql2StructCmd)
 }
 
 var (
-	rootCmd=cobra.Command{
-		Use:"",
+	rootCmd = cobra.Command{
+		Use: "",
 	}
 )
 
-func Execute() error{
+func Execute() error {
 	return rootCmd.Execute()
 }
