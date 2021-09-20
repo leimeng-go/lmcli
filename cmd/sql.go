@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"lmcli/internal/mongo2struct"
 	"lmcli/internal/sql2struct"
 	"log"
 
@@ -54,6 +55,19 @@ var (
 			err = template.Generate(tableName, templateColumns)
 			if err != nil {
 				log.Fatalf("template.Generate err: %v", err)
+			}
+		},
+	}
+)
+
+var (
+	mongo2StructCmd=&cobra.Command{
+		Use:"mongo",
+		Short: "mongo schema 转换和处理",
+		Long: "根据mongo schema 生成mongo go代码",
+		Run: func (cmd *cobra.Command,args [string])  {
+			dbInfo:=mongo2struct.DBInfo{
+				dbType
 			}
 		},
 	}
