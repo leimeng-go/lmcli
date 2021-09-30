@@ -1,4 +1,4 @@
-package mongo2struct
+package sql2struct
 
 import (
 	"context"

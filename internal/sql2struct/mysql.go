@@ -6,7 +6,10 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 )
-
+type MysqlToStruct struct{
+	DBModel
+	
+}
 type DBModel struct {
 	DBEngine *sql.DB
 	DBInfo   DBInfo
