@@ -4,6 +4,7 @@ import (
 	"context"
 	"go.mongodb.org/mongo-driver/x/bsonx"
 	"testing"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,7 +16,18 @@ type Element struct {
 	BsonType    string `json:"bson_type"`
 	Description string `json:"description"`
 }
-
+func TestMongoDBModel_Connect(t *testing.T) {
+	options.Client().SetAuth(options.Credential{
+		AuthSource: "zxw",
+		Username:   "zxw",
+		Password:   "123456",
+	})
+	options.Client().SetAppName("lmcli ")
+	options.Client().SetConnectTimeout(time.Second)
+	options.Client().SetHosts([]string{"localhost:27017"})
+	uri:=options.Client().GetURI()
+	t.Log(uri)
+}
 func TestRunCommandEval(t *testing.T) {
 	ctx := context.Background()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://root:123456@localhost:27017"))
@@ -96,24 +108,4 @@ type SchemaData struct {
 	Properties []Element `json:"properties"`
 }
 
-func TestGetFields(t *testing.T) {
-	db := NewDBModel(&DBInfo{
-		Host:     "127.0.0.1",
-		Port:     27017,
-		User:     "root",
-		Password: "123456",
-	})
-	err := db.Connect()
-	if err != nil {
-		t.Error(err.Error())
-		return
-	}
-	list, err := db.GetFields("test", "users")
-	if err != nil {
-		t.Error(err.Error())
-		return
-	}
-	for _, v := range list {
-		t.Log(v)
-	}
-}
+

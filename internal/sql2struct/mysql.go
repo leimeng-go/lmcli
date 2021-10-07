@@ -12,16 +12,10 @@ type MysqlToStruct struct{
 }
 type DBModel struct {
 	DBEngine *sql.DB
-	DBInfo   DBInfo
+	DBInfo   *DBInfo
 }
 
-type DBInfo struct {
-	DBType   string
-	Host     string
-	UserName string
-	Password string
-	Charset  string
-}
+
 
 type TableColumn struct {
 	ColumnName    string
@@ -32,8 +26,8 @@ type TableColumn struct {
 	ColumnComment string
 }
 
-func NewDBModel(info *DBInfo) *DBModel {
-	return &DBModel{DBInfo: *info}
+func NewMysqlDBModel(info *DBInfo) *DBModel {
+	return &DBModel{DBInfo: info}
 }
 func (m *DBModel) Connect() error {
 	var err error
@@ -45,7 +39,7 @@ func (m *DBModel) Connect() error {
 	return nil
 }
 
-func (m *DBModel) GetColumns(dbName, tableName string) ([]*TableColumn, error) {
+func (m *DBModel) GetFields(dbName, tableName string) (*TableFields, error) {
 	query := `SELECT COLUMN_NAME,DATA_TYPE,COLUMN_KEY,IS_NULLABLE,COLUMN_TYPE,COLUMN_COMMENT FROM COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME=?`
 	rows, err := m.DBEngine.Query(query, dbName, tableName)
 	if err != nil {
@@ -66,5 +60,19 @@ func (m *DBModel) GetColumns(dbName, tableName string) ([]*TableColumn, error) {
 		}
 		columns = append(columns, &column)
 	}
-	return columns, nil
+	list:=make([]*Field,0)
+	for _,v:=range columns {
+		element:=&Field{
+			FieldName: v.ColumnName,
+			FieldType: getMysqlMapType(v.DataType),
+			Comment:   v.ColumnComment,
+			Tags: []string{"json"},
+		}
+		element.TagStr=element.GetTags()
+		list=append(list, element )
+	}
+	return &TableFields{
+		tableName,
+		list,
+	}, nil
 }

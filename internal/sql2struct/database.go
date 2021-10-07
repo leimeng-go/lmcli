@@ -5,12 +5,15 @@ type DataBaseModel interface{
 	GetFields(dbName,tableName string)(*TableFields,error)
 }
 
-type TableFields struct{
+//DBInfo db相关信息
+//todo 使用uri方式会不会更好呢？
+type DBInfo struct {
+	UserName string
+	Password string
+	Host string
+	Port int
+	Charset string
+	DBType string
+	DBName string
 	TableName string
-	List []*Field         
-}
-type Field struct{
-	FieldName string //字段名称
-	FieldType string //字段数据库类型
-	Comment string //字段描述
 }

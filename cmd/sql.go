@@ -1,10 +1,9 @@
 package cmd
 
 import (
-	"lmcli/internal/sql2struct"
-	"log"
-
 	"github.com/spf13/cobra"
+	"log"
+	"lmcli/internal/sql2struct"
 )
 
 func init() {
@@ -19,6 +18,7 @@ func init() {
 }
 
 var (
+	DBType    string
 	username  string
 	password  string
 	host      string
@@ -27,7 +27,6 @@ var (
 	dbType    string
 	dbName    string
 	tableName string
-	
 )
 
 type Database interface{
@@ -39,30 +38,32 @@ var (
 	sql2StructCmd = &cobra.Command{
 		Use:   "sql",
 		Short: "sql转换和处理",
-		Long:  "sql转换和处理",
+		Long:  "sql转换和处理，当前仅支持关系型数据库mysql和非关系型数据库mongo",
 		Run: func(cmd *cobra.Command, args []string) {
 			dbInfo := &sql2struct.DBInfo{
-				DBType:   dbType,
 				Host:     host,
+				Port: Port,
 				UserName: username,
 				Password: password,
 				Charset:  charset,
+				DBName: dbName,
+				TableName: tableName,
 			}
-			dbModel := sql2struct.NewDBModel(dbInfo)
-			err := dbModel.Connect()
-			if err != nil {
-				log.Fatalf("dbmodel.Connect err: %v", err.Error())
+			var dbm sql2struct.DataBaseModel
+			switch dbType {
+			case "mysql":
+				dbm=sql2struct.NewMysqlDBModel(dbInfo)
+			case "mongodb":
+				dbm=sql2struct.NewMongoDBModel(dbInfo)
 			}
-			columns, err := dbModel.GetColumns(dbName, tableName)
-			if err != nil {
-				log.Fatalf("dbModel.GetColumns err: %v", err)
+			err :=dbm.Connect()
+			if err!=nil{
+				log.Fatal(err.Error())
 			}
-			template := sql2struct.NewStructTemplate()
-			templateColumns := template.AssemblyColumns(columns)
-			err = template.Generate(tableName, templateColumns)
-			if err != nil {
-				log.Fatalf("template.Generate err: %v", err)
-			}
+			fields, err:=dbm.GetFields(dbInfo.DBName,dbInfo.TableName)
+
+			tp:=new(sql2struct.StructTemplate)
+			tp.Generate(fields)
 		},
 	}
 )

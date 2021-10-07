@@ -14,18 +14,18 @@ import (
 
 
 
-type DBModel struct{
+type MongoDBModel struct{
 	DBClient *mongo.Client
-    DBInfo DBInfo
+    DBInfo *DBInfo
 }
 
-type DBInfo struct{
-	User string
-	Password string
-	Host string
-	Port int
-
-}
+//type MongoDBInfo struct{
+//	User string
+//	Password string
+//	Host string
+//	Port int
+//    AuthDB string
+//}
 //CollectionField mongo字段映射
 type CollectionField struct{
 	ColumnKey string //字段名称
@@ -37,12 +37,12 @@ type CollectionStruct struct{
     List []*CollectionField 
 }
 
-func NewDBModel(info *DBInfo)*DBModel{
-	return &DBModel{DBInfo:*info}
+func NewMongoDBModel(info *DBInfo)*MongoDBModel{
+	return &MongoDBModel{DBInfo:info}
 }
-func (m *DBModel)Connect()error{
+func (m *MongoDBModel)Connect()error{
 	var err error
-	url:=fmt.Sprintf("mongodb://%s:%s@%s:%d",m.DBInfo.User,m.DBInfo.Password,m.DBInfo.Host,m.DBInfo.Port)
+	url:=fmt.Sprintf("mongodb://%s:%s@%s:%d",m.DBInfo.UserName,m.DBInfo.Password,m.DBInfo.Host,m.DBInfo.Port)
 	ctx,cancel:=context.WithTimeout(context.Background(),20*time.Second)
 	defer cancel()
 	client,err:=mongo.Connect(ctx,options.Client().ApplyURI(url))
@@ -52,12 +52,12 @@ func (m *DBModel)Connect()error{
 	m.DBClient= client
 	return nil
 }
-func (m *DBModel)GetFields(dbName,collectionName string)(*CollectionStruct, error) {
+func (m *MongoDBModel)GetFields(dbName,tableName string)(*TableFields, error) {
 	ctx:=context.Background()
 	dataBase:=m.DBClient.Database(dbName)
 	opts:=make([]*options.ListCollectionsOptions,0)
 	opts = append(opts, options.ListCollections().SetNameOnly(true))
-	res,err:=dataBase.ListCollections(ctx,bson.M{"name":collectionName})
+	res,err:=dataBase.ListCollections(ctx,bson.M{"name":tableName})
 	if err!=nil{
 		return nil,err
 	}
@@ -91,10 +91,20 @@ func (m *DBModel)GetFields(dbName,collectionName string)(*CollectionStruct, erro
 		}
 		list=append(list, element)
 	}
- } 
-
-	return &CollectionStruct{
-		CollectionName: collectionName,
-		List: list,
-	},nil
+ }
+   fields:=make([]*Field,0)
+   for _,v:=range list {
+	   element:=&Field{
+		   FieldName: v.ColumnKey,
+		   FieldType: getMongoMapType(v.ColumnType),
+		   Comment:   v.Description,
+	   }
+	   element.Tags=[]string{}
+	  element.Tags=append(element.Tags,"bson" )
+	   fields=append(fields,element )
+   }
+	return &TableFields{
+	   tableName,
+	   fields,
+   },nil
 }
