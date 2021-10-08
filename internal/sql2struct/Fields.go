@@ -29,7 +29,7 @@ func (this Field)GetTags()string {
 		if len(this.Tags) == i+1 {
 			buf.WriteString(fmt.Sprintf(`%s:%s`,v,this.FormatFieldByTag(v)))
 		}else {
-			buf.WriteString(fmt.Sprintf(`%s:%s `,v,this.FormatFieldByTag(v)))
+			buf.WriteString(fmt.Sprintf(`%s:%sd `,v,this.FormatFieldByTag(v)))
 		}
 	}
 	buf.WriteString("`")

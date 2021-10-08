@@ -42,7 +42,7 @@ func NewMongoDBModel(info *DBInfo)*MongoDBModel{
 }
 func (m *MongoDBModel)Connect()error{
 	var err error
-	url:=fmt.Sprintf("mongodb://%s:%s@%s:%d",m.DBInfo.UserName,m.DBInfo.Password,m.DBInfo.Host,m.DBInfo.Port)
+	url:=fmt.Sprintf("mongodb://%s:%d",m.DBInfo.Host,m.DBInfo.Port)
 	ctx,cancel:=context.WithTimeout(context.Background(),20*time.Second)
 	defer cancel()
 	client,err:=mongo.Connect(ctx,options.Client().ApplyURI(url))
@@ -100,7 +100,8 @@ func (m *MongoDBModel)GetFields(dbName,tableName string)(*TableFields, error) {
 		   Comment:   v.Description,
 	   }
 	   element.Tags=[]string{}
-	  element.Tags=append(element.Tags,"bson" )
+	  element.Tags=append(element.Tags,"bson","json" )
+	  element.TagStr=element.GetTags()
 	   fields=append(fields,element )
    }
 	return &TableFields{

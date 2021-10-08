@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"log"
 	"lmcli/internal/sql2struct"
+	"log"
 )
 
 func init() {
@@ -49,19 +49,29 @@ var (
 				DBName: dbName,
 				TableName: tableName,
 			}
+			log.Printf("数据库类型: %+v",dbType)
+			log.Printf("输入参数: %+v",dbInfo)
 			var dbm sql2struct.DataBaseModel
 			switch dbType {
 			case "mysql":
 				dbm=sql2struct.NewMysqlDBModel(dbInfo)
 			case "mongodb":
 				dbm=sql2struct.NewMongoDBModel(dbInfo)
+			default:
+				log.Fatal("未支持的数据库类型")
+				return
 			}
 			err :=dbm.Connect()
 			if err!=nil{
 				log.Fatal(err.Error())
 			}
 			fields, err:=dbm.GetFields(dbInfo.DBName,dbInfo.TableName)
-
+			if err!=nil{
+				log.Fatal(err.Error())
+			}
+			for _,v:=range fields.List {
+				log.Printf("字段内容: %v",*v)
+			}
 			tp:=new(sql2struct.StructTemplate)
 			tp.Generate(fields)
 		},

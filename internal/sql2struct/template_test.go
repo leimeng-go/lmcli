@@ -22,13 +22,13 @@ func TestStructTemplate_Generate(t *testing.T) {
 				FieldName: "name",
 				FieldType: "string",
 				Comment:   "用户的姓名",
-				Tags: []string{"bson","json","validate"},
+				Tags: []string{"bson"},
 			},
 			{
 				FieldName: "age",
 				FieldType: "int",
 				Comment:   "用户的年龄",
-				Tags:      []string{"bson","json"},
+				Tags:      []string{"bson"},
 			},
 		},
 	}

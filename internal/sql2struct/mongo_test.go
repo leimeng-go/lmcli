@@ -108,4 +108,23 @@ type SchemaData struct {
 	Properties []Element `json:"properties"`
 }
 
+func TestDBModel_Connect(t *testing.T) {
+	mm:=NewMongoDBModel(&DBInfo{
+		//UserName:  "zxw",
+		//Password:  "123456",
+		Host:      "localhost",
+		Port:      27017,
+		DBName:    "test",
+		TableName: "users",
+	})
+	err :=mm.Connect()
+	if err!=nil{
+		t.Error(err.Error())
+	}
+    err =mm.DBClient.Ping(context.Background(),nil)
+	if err!=nil{
+		t.Error(err.Error())
+	}
+	t.Log("ping 验证通过")
+}
 
