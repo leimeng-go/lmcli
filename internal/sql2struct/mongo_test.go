@@ -16,6 +16,7 @@ type Element struct {
 	BsonType    string `json:"bson_type"`
 	Description string `json:"description"`
 }
+
 func TestMongoDBModel_Connect(t *testing.T) {
 	options.Client().SetAuth(options.Credential{
 		AuthSource: "zxw",
@@ -25,7 +26,7 @@ func TestMongoDBModel_Connect(t *testing.T) {
 	options.Client().SetAppName("lmcli ")
 	options.Client().SetConnectTimeout(time.Second)
 	options.Client().SetHosts([]string{"localhost:27017"})
-	uri:=options.Client().GetURI()
+	uri := options.Client().GetURI()
 	t.Log(uri)
 }
 func TestRunCommandEval(t *testing.T) {
@@ -109,7 +110,7 @@ type SchemaData struct {
 }
 
 func TestDBModel_Connect(t *testing.T) {
-	mm:=NewMongoDBModel(&DBInfo{
+	mm := NewMongoDBModel(&DBInfo{
 		//UserName:  "zxw",
 		//Password:  "123456",
 		Host:      "localhost",
@@ -117,14 +118,13 @@ func TestDBModel_Connect(t *testing.T) {
 		DBName:    "test",
 		TableName: "users",
 	})
-	err :=mm.Connect()
-	if err!=nil{
+	err := mm.Connect()
+	if err != nil {
 		t.Error(err.Error())
 	}
-    err =mm.DBClient.Ping(context.Background(),nil)
-	if err!=nil{
+	err = mm.DBClient.Ping(context.Background(), nil)
+	if err != nil {
 		t.Error(err.Error())
 	}
 	t.Log("ping 验证通过")
 }
-

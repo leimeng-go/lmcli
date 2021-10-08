@@ -8,21 +8,21 @@ import (
 )
 
 func TestStructTemplate_Generate(t *testing.T) {
-	tpl,err:=template.New("test").Funcs(map[string]interface{}{
-		"ToUpperCamelCase":strings.Title,
+	tpl, err := template.New("test").Funcs(map[string]interface{}{
+		"ToUpperCamelCase": strings.Title,
 	}).Parse(structTpl)
-	if err!=nil{
+	if err != nil {
 		t.Error(err.Error())
 		return
 	}
-	data:= TableFields{
+	data := TableFields{
 		TableName: "mytest",
 		List: []*Field{
 			{
 				FieldName: "name",
 				FieldType: "string",
 				Comment:   "用户的姓名",
-				Tags: []string{"bson"},
+				Tags:      []string{"bson"},
 			},
 			{
 				FieldName: "age",
@@ -32,8 +32,8 @@ func TestStructTemplate_Generate(t *testing.T) {
 			},
 		},
 	}
-	for i,_:=range data.List {
-		data.List[i].TagStr=data.List[i].GetTags()
+	for i, _ := range data.List {
+		data.List[i].TagStr = data.List[i].GetTags()
 	}
-	tpl.Execute(os.Stdout,&data)
+	tpl.Execute(os.Stdout, &data)
 }

@@ -10,7 +10,7 @@ func init() {
 	sql2StructCmd.Flags().StringVarP(&username, "username", "", "", "请输入数据库的账号")
 	sql2StructCmd.Flags().StringVarP(&password, "password", "", "", "请输入数据库的密码")
 	sql2StructCmd.Flags().StringVarP(&host, "host", "", "", "请输入数据库的Host")
-	sql2StructCmd.Flags().IntVarP(&Port,"port","",3306,"请输入数据库的端口")
+	sql2StructCmd.Flags().IntVarP(&Port, "port", "", 3306, "请输入数据库的端口")
 	sql2StructCmd.Flags().StringVarP(&charset, "charset", "", "utf8mb4", "请输入数据库的编码")
 	sql2StructCmd.Flags().StringVarP(&dbType, "type", "", "mysql", "请输入数据库实例类型")
 	sql2StructCmd.Flags().StringVarP(&dbName, "db", "", "", "请输入数据库名称")
@@ -22,16 +22,16 @@ var (
 	username  string
 	password  string
 	host      string
-	Port int
+	Port      int
 	charset   string
 	dbType    string
 	dbName    string
 	tableName string
 )
 
-type Database interface{
-	Connect()error   
-	GetFields(dbName,tableName string)
+type Database interface {
+	Connect() error
+	GetFields(dbName, tableName string)
 }
 
 var (
@@ -41,40 +41,39 @@ var (
 		Long:  "sql转换和处理，当前仅支持关系型数据库mysql和非关系型数据库mongo",
 		Run: func(cmd *cobra.Command, args []string) {
 			dbInfo := &sql2struct.DBInfo{
-				Host:     host,
-				Port: Port,
-				UserName: username,
-				Password: password,
-				Charset:  charset,
-				DBName: dbName,
+				Host:      host,
+				Port:      Port,
+				UserName:  username,
+				Password:  password,
+				Charset:   charset,
+				DBName:    dbName,
 				TableName: tableName,
 			}
-			log.Printf("数据库类型: %+v",dbType)
-			log.Printf("输入参数: %+v",dbInfo)
+			log.Printf("数据库类型: %+v", dbType)
+			log.Printf("输入参数: %+v", dbInfo)
 			var dbm sql2struct.DataBaseModel
 			switch dbType {
 			case "mysql":
-				dbm=sql2struct.NewMysqlDBModel(dbInfo)
+				dbm = sql2struct.NewMysqlDBModel(dbInfo)
 			case "mongodb":
-				dbm=sql2struct.NewMongoDBModel(dbInfo)
+				dbm = sql2struct.NewMongoDBModel(dbInfo)
 			default:
 				log.Fatal("未支持的数据库类型")
 				return
 			}
-			err :=dbm.Connect()
-			if err!=nil{
+			err := dbm.Connect()
+			if err != nil {
 				log.Fatal(err.Error())
 			}
-			fields, err:=dbm.GetFields(dbInfo.DBName,dbInfo.TableName)
-			if err!=nil{
+			fields, err := dbm.GetFields(dbInfo.DBName, dbInfo.TableName)
+			if err != nil {
 				log.Fatal(err.Error())
 			}
-			for _,v:=range fields.List {
-				log.Printf("字段内容: %v",*v)
+			for _, v := range fields.List {
+				log.Printf("字段内容: %v", *v)
 			}
-			tp:=new(sql2struct.StructTemplate)
+			tp := new(sql2struct.StructTemplate)
 			tp.Generate(fields)
 		},
 	}
 )
-

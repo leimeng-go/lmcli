@@ -6,16 +6,14 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 )
-type MysqlToStruct struct{
+
+type MysqlToStruct struct {
 	DBModel
-	
 }
 type DBModel struct {
 	DBEngine *sql.DB
 	DBInfo   *DBInfo
 }
-
-
 
 type TableColumn struct {
 	ColumnName    string
@@ -60,16 +58,16 @@ func (m *DBModel) GetFields(dbName, tableName string) (*TableFields, error) {
 		}
 		columns = append(columns, &column)
 	}
-	list:=make([]*Field,0)
-	for _,v:=range columns {
-		element:=&Field{
+	list := make([]*Field, 0)
+	for _, v := range columns {
+		element := &Field{
 			FieldName: v.ColumnName,
 			FieldType: getMysqlMapType(v.DataType),
 			Comment:   v.ColumnComment,
-			Tags: []string{"json"},
+			Tags:      []string{"json"},
 		}
-		element.TagStr=element.GetTags()
-		list=append(list, element )
+		element.TagStr = element.GetTags()
+		list = append(list, element)
 	}
 	return &TableFields{
 		tableName,

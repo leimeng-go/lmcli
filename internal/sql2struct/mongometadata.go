@@ -14,6 +14,7 @@ var (
 		"date":   "time.Time",
 	}
 )
-func getMongoMapType(typeMongo string)string {
+
+func getMongoMapType(typeMongo string) string {
 	return mongoToGoType[typeMongo]
 }
