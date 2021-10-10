@@ -1,10 +1,11 @@
 package sql2struct
 
 import (
-	"html/template"
 	"os"
+	"sort"
 	"strings"
 	"testing"
+	"text/template"
 )
 
 func TestStructTemplate_Generate(t *testing.T) {
@@ -17,7 +18,7 @@ func TestStructTemplate_Generate(t *testing.T) {
 	}
 	data := TableFields{
 		TableName: "mytest",
-		List: []*Field{
+		List: FieldList{
 			{
 				FieldName: "name",
 				FieldType: "string",
@@ -25,15 +26,23 @@ func TestStructTemplate_Generate(t *testing.T) {
 				Tags:      []string{"bson"},
 			},
 			{
-				FieldName: "age",
+				FieldName: "age_state",
 				FieldType: "int",
 				Comment:   "用户的年龄",
 				Tags:      []string{"bson"},
 			},
 		},
 	}
+	list:=data.List
+	sort.Sort(list)
+	t.Log(list)
 	for i, _ := range data.List {
 		data.List[i].TagStr = data.List[i].GetTags()
 	}
 	tpl.Execute(os.Stdout, &data)
+}
+func TestStrCompare(t *testing.T){
+	a:= "name"
+	b:= "age"
+	t.Log(a[0]>b[0])
 }

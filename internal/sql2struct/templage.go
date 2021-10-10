@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"lmcli/internal/word"
 	"os"
+	"sort"
 )
 
 const (
@@ -22,8 +23,9 @@ type StructTemplate struct {
 
 func (t *StructTemplate) Generate(data *TableFields) error {
 	t.structTpl = structTpl
+	sort.Sort(data.List)
 	tpl := template.Must(template.New("sql2struct").Funcs(map[string]interface{}{
-		"ToUpperCamelCase": word.CamelCaseToUnderscore,
+		"ToUpperCamelCase": word.UnderscoreToUpperCamelCase,
 	}).Parse(t.structTpl))
 	err := tpl.Execute(os.Stdout, &data)
 	if err != nil {
